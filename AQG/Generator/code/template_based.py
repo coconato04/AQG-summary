@@ -3,15 +3,13 @@ import spacy
 import pandas as pd
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from nltk.tokenize import sent_tokenize
-import torch
 
 # Load Spacy model for NER
 nlp = spacy.load('en_core_web_trf')
 
 # Initialize MT5 model
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-tokenizer = T5Tokenizer.from_pretrained('T5-base')
-t5_model = T5ForConditionalGeneration.from_pretrained('T5-base').to(device)
+tokenizer = T5Tokenizer.from_pretrained('t5-base')
+t5_model = T5ForConditionalGeneration.from_pretrained('t5-base')  # Tidak ada pengaturan device, default ke CPU
 
 # Load template and labeled entity files
 TEMPLATE_FILE_PATH = 'Generator/assets/data/template_soal_label.xlsx'
@@ -67,8 +65,9 @@ def select_questions(matched_questions, num_questions):
 
 def generate_answer(teks_konteks, soal, max_length=100):
     input_text = f"Jawab singkat: {soal} Konteks: {teks_konteks}"
-    input_ids = tokenizer.encode(input_text, return_tensors="pt", truncation=True, max_length=512).to(device)
+    input_ids = tokenizer.encode(input_text, return_tensors="pt", truncation=True, max_length=512)
     
+    # Model secara default akan berjalan di CPU jika tidak ada pengaturan CUDA
     output_ids = t5_model.generate(
         input_ids,
         max_length=max_length,  # Bisa disesuaikan untuk jawaban panjang atau pendek
@@ -78,42 +77,9 @@ def generate_answer(teks_konteks, soal, max_length=100):
     jawaban = tokenizer.decode(output_ids[0], skip_special_tokens=True)
     return jawaban
 
-
 def validate_answer(answer):
     return bool(answer and len(answer.split()) > 3 and answer.lower() not in ["no answer", "none", "irrelevant"])
 
-# def generate_questions_and_answers(materi, questions, num_questions, question_type, labeled_entities):
-#     context_based_qna = []
-#     for question in questions:
-#         if len(context_based_qna) >= num_questions:
-#             break
-
-#         answer = generate_answer(materi, question)
-#         if validate_answer(answer):
-#             if question_type == "isian":
-#                 context_based_qna.append({'question': question, 'answer': answer})
-#             elif question_type == "PG":
-#                 # Ambil satu entitas acak dari labeled_entities yang sesuai dengan label entitas dalam soal
-#                 ner_choice = random.choice([ent for ent, label in labeled_entities.items() if label in question])
-
-#                 # Buat pilihan jawaban sesuai permintaan
-#                 choices = ["Semua Salah", answer, "Semua Benar", ner_choice]
-
-#                 # Acak posisi jawaban
-#                 random.shuffle(choices)
-
-#                 context_based_qna.append({
-#                     'question': question,
-#                     'choices': {
-#                         'A': choices[0],
-#                         'B': choices[1],
-#                         'C': choices[2],
-#                         'D': choices[3]
-#                     },
-#                     'answer': answer 
-#                 })
-
-#     return context_based_qna
 def generate_questions_and_answers(materi, questions, num_questions, question_type, labeled_entities):
     context_based_qna = []
     for question in questions:
