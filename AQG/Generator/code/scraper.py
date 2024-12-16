@@ -4,7 +4,6 @@ from PyPDF2 import PdfWriter, PdfReader
 from tkinter import filedialog, messagebox, simpledialog, Tk, Button, Label
 from pdf2docx import Converter
 import pdfplumber
-import fitz
 from docx import Document
 from docx2pdf import convert
 
