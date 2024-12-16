@@ -1,7 +1,7 @@
 import random
 import spacy
 import pandas as pd
-from transformers import MT5Tokenizer, MT5ForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 from nltk.tokenize import sent_tokenize
 import torch
 
@@ -10,8 +10,8 @@ nlp = spacy.load('en_core_web_trf')
 
 # Initialize MT5 model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-tokenizer = MT5Tokenizer.from_pretrained('google/mt5-base')
-mt5_model = MT5ForConditionalGeneration.from_pretrained('google/mt5-base').to(device)
+tokenizer = T5Tokenizer.from_pretrained('T5-base')
+t5_model = T5ForConditionalGeneration.from_pretrained('T5-base').to(device)
 
 # Load template and labeled entity files
 TEMPLATE_FILE_PATH = 'Generator/assets/data/template_soal_label.xlsx'
@@ -69,7 +69,7 @@ def generate_answer(teks_konteks, soal, max_length=100):
     input_text = f"Jawab singkat: {soal} Konteks: {teks_konteks}"
     input_ids = tokenizer.encode(input_text, return_tensors="pt", truncation=True, max_length=512).to(device)
     
-    output_ids = mt5_model.generate(
+    output_ids = t5_model.generate(
         input_ids,
         max_length=max_length,  # Bisa disesuaikan untuk jawaban panjang atau pendek
         num_beams=5,
