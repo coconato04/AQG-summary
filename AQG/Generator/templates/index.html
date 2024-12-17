@@ -1,0 +1,686 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQG Summary</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #000428, #004e92);
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+        }
+        
+        .navbar-brand {
+            font-family: 'Arial', sans-serif;
+            font-size: 1.75rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+            animation: neonGlow 15s ease-in-out infinite;
+        }
+        
+        @keyframes neonGlow {
+            0% { text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff; color: #ffffff; }
+            10% { text-shadow: 0 0 10px #aee3fa, 0 0 20px #aee3fa, 0 0 30px #aee3fa; color: #aee3fa; }
+            20% { text-shadow: 0 0 10px #7cd7ff, 0 0 20px #7cd7ff, 0 0 30px #7cd7ff; color: #7cd7ff; }
+            30% { text-shadow: 0 0 10px #45c4fc, 0 0 20px #45c4fc, 0 0 30px #45c4fc; color: #45c4fc; }
+            40% { text-shadow: 0 0 10px #00b2ff, 0 0 20px #00b2ff, 0 0 30px #00b2ff; color: #00b2ff; }
+            60% { text-shadow: 0 0 10px #45c4fc, 0 0 20px #45c4fc, 0 0 30px #45c4fc; color: #45c4fc; }
+            70% { text-shadow: 0 0 10px #7cd7ff, 0 0 20px #7cd7ff, 0 0 30px #7cd7ff; color: #7cd7ff; }
+            90% { text-shadow: 0 0 10px #aee3fa, 0 0 20px #aee3fa, 0 0 30px #aee3fa; color: #aee3fa; }
+            100% { text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff; color: #ffffff; }
+        }
+        
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: #ffffff;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #00ff00;
+        }
+        
+        .main-content {
+            position: relative;
+            z-index: 2;
+            color: #ffffff;
+            text-align: center;
+            padding: 10% 5%;
+        }
+        
+        .btn-upload, .btn-process {
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+            background: transparent;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 10px 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .btn-upload:hover, .btn-process:hover {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        .form-control {
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+            padding: 20px;
+            font-size: 1.25rem;
+            color: #ffffff;
+            background: transparent;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-control::placeholder {
+            color: #ffffff;
+        }
+
+        .form-message {
+            color: yellow;
+            margin-top: 10px;
+            display: none; /* Initially hidden */
+        }
+
+        .clear-btn {
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            background: transparent;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none; /* Initially hidden */
+            margin-left: 10px;
+        }
+
+        .file-upload-container {
+            display: flex;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .file-upload-container input[type="file"] {
+            flex: 1;
+        }
+
+        .file-upload-container button {
+            display: none;
+        }
+        
+        #loadingIndicator {
+            display: none; /* Ensure it is hidden by default */
+            background-color: black; /* Full black background */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            text-align: center;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .progress {
+            width: 50%; /* Bar loading di tengah layar */
+            height: 30px;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            background-color: #28a745;
+        }
+        
+        #progressText {
+            font-size: 1.5rem;
+            margin-top: 10px;
+        }
+        
+        .spinner-border {
+            margin-bottom: 20px;
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+
+        .modal.show {
+            z-index: 10000; /* Ensure modal is above loading */
+        }
+        
+        .modal-body .form-control {
+            color: #000; /* Set warna teks menjadi hitam agar terlihat */
+            background-color: #fff; /* Set warna background input menjadi putih */
+        }
+        .modal-body .form-control::placeholder {
+            color: #888; /* Warna placeholder yang kontras namun tidak terlalu mencolok */
+        }
+
+        #chapterOptions label {
+            margin-bottom: 10px; /* Berikan sedikit spasi antar tombol */
+        }        
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'index' %}">AQG Summary</a>
+        </div>
+    </nav>
+    <div class="main-content container">
+        <h1 class="display-4">Selamat Datang di AQG Summary</h1>
+        <p class="lead">Unggah ebook IPS Anda untuk mendapatkan rangkuman dan pertanyaan yang dibuat secara otomatis!</p>
+        <form id="uploadForm" action="{% url 'upload_file' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" id="inputText" class="form-control mb-3" placeholder="Masukan Teks... (Maksimal 3000 kata)" name="input_text">
+            <div class="file-upload-container mb-3">
+                <input type="file" id="fileUpload" class="form-control btn-upload" name="file_upload" accept=".pdf, .doc, .docx">
+                <button type="button" id="clearBtn" class="clear-btn" aria-label="Clear file"><i class="bi bi-trash3"></i></button>
+            </div>
+            <button type="button" class="btn btn-process">Mulai Proses</button>
+            <div id="formMessage" class="form-message">Anda telah mengunggah berkas. Jika Anda ingin membuat perubahan pada input, harap hapus berkas yang diunggah terlebih dahulu.</div>
+            <div id="textmessage" class="form-message">Anda telah melakukan input teks secara manual, fitur unggah file dinonaktifkan.</div>
+            <div id="bmessage" class="form-message">Masukan input terlebih dahulu</div>
+        </form>
+    </div>
+
+    <!-- Modal for Inputting Roman and Arabic Page Numbers -->
+    <div class="modal fade" id="pageInputModal" tabindex="-1" aria-labelledby="pageInputModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pageInputModalLabel">Masukkan Jumlah Halaman</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="pageInputForm">
+                        <div class="mb-3">
+                            <label for="romawi_pages" class="form-label">Halaman Romawi</label>
+                            <small class="form-text text-muted">
+                                Periksa jumlah halaman bernomor romawi yang ada sebelum Bab 1 (termasuk cover serta halaman yang tidak memiliki nomor sebelum Bab 1)
+                            </small>
+                            <input type="number" class="form-control" id="romawi_pages" name="romawi_pages" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Kirim</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Chapter Selection -->
+    <div class="modal fade" id="chapterModal" tabindex="-1" aria-labelledby="chapterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chapterModalLabel">Pilih Bab</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.href='{% url 'index' %}'"></button>
+                </div>
+                <div class="modal-body" id="chapterOptions">
+                    <!-- Daftar bab akan diinject di sini -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="selectChapterBtn">Proses Bab</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="noChaptersModal" tabindex="-1" aria-labelledby="noChaptersModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="noChaptersModalLabel">Tidak ditemukan Bab</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tidak ada bab atau tema yang terdeteksi. Apakah Anda ingin melanjutkan memproses seluruh teks?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.href='{% url 'index' %}'">Tidak, Kembali</button>
+                    <button type="button" class="btn btn-primary" id="continueWithoutChaptersBtn">Ya, Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar and Loading -->
+    <div id="loadingIndicator">
+        <div class="spinner-border text-light" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <div class="progress">
+            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <p id="progressText">0% Proses...</p>
+    </div>
+    <div id="star-field"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/starfield.js' %}"></script>
+    <script>
+        const startProcessingButton = document.querySelector('.btn-process');
+        const inputText = document.getElementById('inputText');
+        const fileUpload = document.getElementById('fileUpload');
+        const formMessage = document.getElementById('formMessage');
+        const textMessage = document.getElementById('textmessage');
+        const bmessage = document.getElementById('bmessage');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileUploadContainer = document.querySelector('.file-upload-container');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const form = document.getElementById('uploadForm');
+        const modal = new bootstrap.Modal(document.getElementById('pageInputModal'));
+        const pageInputForm = document.getElementById('pageInputForm');
+        let progressInterval;
+        textMessage.style.display = 'none';
+
+        function getCSRFToken() {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, 10) === 'csrftoken=') {
+                        cookieValue = decodeURIComponent(cookie.substring(10));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }        
+
+        // Hide loading indicator when the page first loads
+        window.addEventListener('load', function() {
+            loadingIndicator.style.display = 'none';
+        });
+
+        // Prevent form submission with Enter key
+        inputText.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        // Event listener untuk input teks
+        inputText.addEventListener('input', function() {
+            if (inputText.value.trim().length > 0) {
+                fileUpload.disabled = true;
+                clearBtn.style.display = 'none';
+                formMessage.style.display = 'none'; // Sembunyikan pesan file
+                textMessage.style.display = 'block'; // Tampilkan pesan teks di bawah file upload
+            } else {
+                fileUpload.disabled = false;
+                textMessage.style.display = 'none'; // Sembunyikan pesan teks
+            }
+        });
+
+        // Event listener untuk input file
+        fileUpload.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                inputText.disabled = true;
+                inputText.value = ''; // Bersihkan input teks
+                textMessage.style.display = 'none'; // Sembunyikan pesan teks
+                formMessage.style.display = 'block'; // Tampilkan pesan file
+                clearBtn.style.display = 'inline'; // Tampilkan tombol hapus
+                fileUploadContainer.style.flex = '0 0 80%'; // Atur lebar container
+            } else {
+                inputText.disabled = false;
+                formMessage.style.display = 'none'; // Sembunyikan pesan file
+                clearBtn.style.display = 'none'; // Sembunyikan tombol hapus
+                fileUploadContainer.style.flex = '1'; // Reset lebar container
+            }
+        });
+
+        clearBtn.addEventListener('click', function() {
+            fileUpload.value = ''; // Hapus file yang diunggah
+            inputText.disabled = false; // Aktifkan input teks
+            formMessage.style.display = 'none'; // Sembunyikan pesan file
+            clearBtn.style.display = 'none'; // Sembunyikan tombol hapus
+            fileUploadContainer.style.flex = '1'; // Reset lebar container
+        });
+
+        function hideMessage(element, delay = 3000) {
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, delay);
+        }
+
+        startProcessingButton.addEventListener('click', function(event) {
+            bmessage.style.display = 'none'; // Sembunyikan pesan jika sebelumnya ditampilkan
+            // Cek apakah input teks atau file sudah diisi
+            if (inputText.value.trim().length === 0 && fileUpload.files.length === 0) {
+                bmessage.style.display = 'block'; // Tampilkan pesan
+                event.preventDefault();
+                event.stopPropagation();
+                hideMessage(bmessage);
+            } else {
+                // Jika ada input, lanjutkan ke modal
+                modal.show();
+            }
+        });
+
+        // Handle form submission for both text input and file upload
+        pageInputForm.addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent form default submission
+        
+            const romawiPages = document.getElementById('romawi_pages').value;
+        
+            if (romawiPages) {
+                modal.hide();  // Close modal input pages
+                loadingIndicator.style.display = 'flex';
+                // Create FormData object
+                const formData = new FormData();
+        
+                if (inputText.value.trim().length > 0) {
+                    // For manual text input
+                    formData.append('manual_text', inputText.value.trim());
+                    formData.append('romawi_pages', romawiPages);
+
+                    let intermediateProgress = 0;
+                    const gradualIncrease = setInterval(() => {
+                        intermediateProgress += 1;
+                        if (intermediateProgress >= 10) {
+                            clearInterval(gradualIncrease);
+                        }
+                        updateProgress(intermediateProgress);
+                    }, 1000);
+                    // Send request to `input_text` endpoint
+                    fetch('{% url "input_text" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCSRFToken()  // Add CSRF header
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.no_chapters){
+                            clearInterval(progressInterval);
+                            updateProgress(2);
+                            showNoChaptersModal();
+                        }else if (data.chapters) {
+                            clearInterval(progressInterval);  // Stop previous progress
+                            updateProgress(10);  // Ensure it is at 10%
+                            console.log('Chapters detected from input text:', data.chapters);
+                            showChapterModal(data.chapters);  // Show chapter selection modal
+                        } else if (data.error) {
+                            console.error('Error processing input text:', data.error);
+                            alert('An error occurred: ' + data.error);
+                            loadingIndicator.style.display = 'none';  // Hide loading indicator on error
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        alert('An error occurred: ' + error.message);
+                        clearInterval(progressInterval);  // Stop progress on error
+                        loadingIndicator.style.display = 'none';  // Hide loading indicator on error
+                    });
+                } else if (fileUpload.files.length > 0) {
+                    // For file upload
+                    const uploadedFile = fileUpload.files[0];
+                    formData.append('file_upload', uploadedFile);
+                    formData.append('romawi_pages', romawiPages);
+                    let intermediateProgress = 0;
+                    const gradualIncrease = setInterval(() => {
+                        intermediateProgress += 1;
+                        if (intermediateProgress >= 10) {
+                            clearInterval(gradualIncrease);
+                        }
+                        updateProgress(intermediateProgress);
+                    }, 1000);
+                    // Send request to `upload_file` endpoint
+                    fetch('{% url "upload_file" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCSRFToken()  // Add CSRF header
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.no_chapters){
+                            clearInterval(progressInterval);
+                            updateProgress(2);
+                            showNoChaptersModal();
+                        }else if (data.chapters) {
+                            clearInterval(progressInterval);  // Stop previous progress
+                            updateProgress(10);  // Ensure it is at 10%
+                            showChapterModal(data.chapters);  // Show chapter selection modal
+                        } else if (data.error) {
+                            console.error('Error processing file:', data.error);
+                            alert('An error occurred: ' + data.error);
+                            loadingIndicator.style.display = 'none';  // Hide loading indicator on error
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        alert('An error occurred: ' + error.message);
+                        clearInterval(progressInterval);  // Stop progress on error
+                        loadingIndicator.style.display = 'none';  // Hide loading indicator on error
+                    });
+                }
+            }
+        });
+
+        function updateProgress(percentage) {
+            let currentProgress = parseFloat(progressBar.style.width) || 0;  // Start from current progress
+        
+            clearInterval(progressInterval);  // Stop previous interval
+            progressInterval = setInterval(() => {
+                if (currentProgress < percentage) {
+                    currentProgress += 0.4;  // Increment progress smoothly
+                    if (currentProgress > percentage) {
+                        currentProgress = percentage;  // Ensure it doesn't exceed the target
+                    }
+                    progressBar.style.width = `${currentProgress}%`;
+                    progressText.textContent = `${Math.floor(currentProgress)}% Proses...`;
+                } else {
+                    clearInterval(progressInterval);
+                }
+            }, 100);  // Smooth update speed
+        }
+
+        function completeProgress() {
+            updateProgress(100);
+        }
+
+        function showChapterModal(chapters) {
+            const chapterOptions = document.getElementById('chapterOptions');
+            chapterOptions.innerHTML = ''; // Clear existing options
+            const selectChapterBtn = document.getElementById('selectChapterBtn');
+            selectChapterBtn.disabled = true; // Disable submit button initially
+        
+            // Loop untuk menambahkan opsi bab dengan title, start_page, dan end_page
+            chapters.forEach((chapter, index) => {
+                const option = document.createElement('div');
+                const checkboxId = `chapter-checkbox-${index}`;
+        
+                option.innerHTML = `
+                    <input type="checkbox" class="btn-check" id="${checkboxId}" value="${index}" autocomplete="off">
+                    <label class="btn btn-outline-primary w-100 text-start" for="${checkboxId}">
+                        ${chapter.title} (Halaman ${chapter.start_page} - ${chapter.end_page})
+                    </label>
+                `;
+                chapterOptions.appendChild(option);
+            });
+        
+            const chapterModal = new bootstrap.Modal(document.getElementById('chapterModal'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+            chapterModal.show();
+        
+            document.querySelectorAll('#chapterOptions input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (checkbox.checked) {
+                        selectChapterBtn.disabled = false;
+                        document.querySelectorAll('#chapterOptions input[type="checkbox"]').forEach(otherCheckbox => {
+                            if (otherCheckbox !== checkbox) {
+                                otherCheckbox.disabled = true;
+                            }
+                        });
+                    } else {
+                        selectChapterBtn.disabled = true;
+                        document.querySelectorAll('#chapterOptions input[type="checkbox"]').forEach(otherCheckbox => {
+                            otherCheckbox.disabled = false;
+                        });
+                    }
+                });
+            });
+        
+            selectChapterBtn.addEventListener('click', function() {
+                const selectedChapters = Array.from(document.querySelectorAll('#chapterOptions input[type="checkbox"]:checked'))
+                                            .map(input => input.value);
+                if (selectedChapters.length > 0) {
+                    chapterModal.hide();
+                    processSelectedChapters(selectedChapters); // Kirim bab terpilih untuk diproses
+                }
+            });
+        }
+        
+        function processSelectedChapters(selectedChapters) {
+            const selectedChapterIndex = parseInt(selectedChapters[0]);  // Indeks pertama dipilih
+            if (selectedChapterIndex === null || isNaN(selectedChapterIndex) || selectedChapterIndex < 0) {
+                console.error("Tidak ada bab valid yang dipilih.");
+                alert("Pilihlah bab yang valid sebelum melanjutkan.");
+                return;
+            }
+            let intermediateProgress = 10;
+            const gradualIncrease = setInterval(() => {
+                intermediateProgress += 2;
+                if (intermediateProgress >= 95) {
+                    clearInterval(gradualIncrease);
+                }
+                updateProgress(intermediateProgress);
+            }, 1000);  // Increase by 5% every second
+
+            const fileUpload = document.getElementById('fileUpload');
+            if (!fileUpload.files[0]) {
+                console.error("Tidak ada file yang diunggah.");
+                alert("Silakan unggah file sebelum melanjutkan.");
+                return;
+            }
+        
+            const formData = new FormData();
+            formData.append('selected_index', selectedChapterIndex);
+            formData.append('file_name', fileUpload.files[0].name);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+            fetch('{% url "process_selected_chapter" %}', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    updateProgress(100);
+                    console.log('Bab berhasil diproses.');
+                    setTimeout(() => {
+                        window.location.href = "{% url 'summary' %}";
+                    }, 1000);
+                } else {
+                    console.error('Kesalahan dalam memproses bab:', data.error);
+                    alert('Terjadi kesalahan: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('Terjadi kesalahan: ' + error.message);
+            });
+        }
+        
+        let selectedChapters = [];
+        document.querySelectorAll('input[name="selected_chapter"]:checked').forEach(checkbox => {
+            selectedChapters.push(checkbox.value);
+        });
+
+        const formData = new FormData();
+        formData.append('selected_chapters', JSON.stringify(selectedChapters));  // Pastikan dikirim dalam JSON atau array
+        
+        function showNoChaptersModal() {
+            const noChaptersModal = new bootstrap.Modal(document.getElementById('noChaptersModal'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+            noChaptersModal.show();
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            const continueWithoutChaptersBtn = document.getElementById('continueWithoutChaptersBtn');
+        
+            continueWithoutChaptersBtn.addEventListener('click', function () {
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                loadingIndicator.style.display = 'flex'; // Tampilkan indikator loading
+                
+                const formData = new FormData();
+                formData.append('continue_without_chapters', true); // Menandai permintaan untuk melanjutkan tanpa chapter
+                formData.append('csrfmiddlewaretoken', getCSRFToken()); // Sertakan CSRF token
+        
+                fetch('{% url "process_selected_chapter" %}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Sukses, tutup modal dan lanjutkan
+                        const noChaptersModal = bootstrap.Modal.getInstance(document.getElementById('noChaptersModal'));
+                        if (noChaptersModal) {
+                            noChaptersModal.hide(); // Tutup modal
+                        }
+                        loadingIndicator.style.display = 'none'; // Sembunyikan indikator loading
+                        window.location.href = "{% url 'summary' %}"; // Alihkan ke halaman summary
+                    } else {
+                        // Tampilkan pesan kesalahan dan tetap tutup modal
+                        alert('Terjadi kesalahan: ' + data.error);
+                        loadingIndicator.style.display = 'none'; // Sembunyikan indikator loading
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    alert('Terjadi kesalahan: ' + error.message);
+                    loadingIndicator.style.display = 'none'; // Sembunyikan indikator loading
+                });
+            });
+        });             
+    </script>
+</html>
