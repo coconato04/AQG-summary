@@ -37,3 +37,6 @@ di terminal akan ditampilkan sebuah akses website program dengan link lokal: htt
 
 
 penjelasan lebih lanjut terkait fungsi dan fitur yang ada di dalam website dapat dilihat melalui buku panduan manual website yang berjudul: 535210014_MANUALBOOK.pdf
+
+syarat menggunakan project ini yaitu:
+- Python 3.12.4
