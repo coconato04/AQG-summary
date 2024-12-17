@@ -1,37 +1,4 @@
-# AQG-summary
-struktur program
-AQG-summary/                         # Root direktori project
-│
-├── AQG/                             # Project utama Django
-│   ├── AQG/                         # Folder konfigurasi utama project Django
-│   │   ├── __init__.py              
-│   │   ├── settings.py              
-│   │   ├── urls.py                  
-│   │   ├── wsgi.py                  
-│   │   └── asgi.py         
-│   │
-│   ├── Generator/                   # Aplikasi Django (startapp)
-│   │   ├── assets/                  # Dataset atau file pendukung lainnya
-│   │   ├── code/                    # backend
-│   │   ├── migrations/              
-│   │   ├── static/                  # File statis (CSS, JS)
-│   │   ├── templates/               # Template frontend (HTML)
-│   │   ├── views.py                 
-│   │   ├── models.py                
-│   │   ├── admin.py                 
-│   │   ├── tests.py                 
-│   │   └── apps.py                  
-│   │
-│   └── manage.py                    
-│
-├── ENV/                             # Virtual environment untuk project 
-│
-├── manualbook.pdf                   
-│
-├── README.md                        
-│
-└── requirements.txt                 
-
+# AQG-summary               
 
 untuk menjalankan project ini memerlukan beberapa setup
 
